@@ -1,0 +1,61 @@
+import * as React from 'react';
+import { View, Text,FlatList, SafeAreaView ,Animated, StyleSheet} from 'react-native';
+import slides from './slides';
+import OnBoardingItems from './onBoardingItems';
+import Paginator from './paginator';
+import NextScreen from './nextButton';
+
+export default function SettingsScreen({ navigation }) {
+    const scrollX= React.useRef(new Animated.Value(0)).current;
+    const [currentIndex,setCurrentIndex]=React.useState(0);
+    const viewableItemsChanged=React.useRef(({viewableItems})=>{
+        setCurrentIndex(viewableItems[0].index);
+    }).current;
+    const viewConfig =React.useRef({viewAreaCoveragePercentThreshold:50}).current;
+    const slidesRef=React.useRef(null)
+
+    const scrollTo=()=>{
+        if(currentIndex<slides.length-1){
+            slidesRef.current.scrollToIndex({index:currentIndex+1})
+        }
+        else{
+            console.log('last item')
+        }
+    }
+    return (
+        
+        <SafeAreaView style={{flex:1,justifyContent:"center",alignItems:"center"}}>
+    
+            <View style={{flex:3}}>
+                <FlatList data={slides} 
+                renderItem={({item})=><OnBoardingItems item={item}/>}
+                
+                horizontal
+                showsHorizontalScrollIndicator
+                pagingEnabled
+                bounces={false}
+                keyExtractor={(item)=>item.id}
+                onScroll={Animated.event([{nativeEvent:{contentOffset:{x:scrollX}}}],
+                       {useNativeDriver:false,})}
+                       scrollEventThrottle={32}
+                       onViewableItemsChanged={viewableItemsChanged}
+                       viewabilityConfig={viewConfig}
+                       ref={slidesRef}
+             
+                />
+ 
+            </View>
+
+            {/* <Paginator data={slides} scrollX={scrollX}/> */}
+            {/* <NextScreen scrollTo={scrollTo} percentage={(currentIndex+1)*( 100 / slides.length)}/> */}
+            </SafeAreaView>
+        
+        
+    );
+}
+const styles= StyleSheet.create({
+    container:{
+        
+
+    }
+})
